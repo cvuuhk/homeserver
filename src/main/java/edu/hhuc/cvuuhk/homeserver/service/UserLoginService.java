@@ -22,7 +22,7 @@ public class UserLoginService implements UserDetailsService {
       throw new UsernameNotFoundException("账户" + username + "不存在");
     }
 
-    logger.info("用户" + username + "登陆成功");
+    logger.info("用户" + username + "登录成功");
     return details;
   }
 }

@@ -2,10 +2,11 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>主页</title>
+    <title>设备信息</title>
 </head>
 <body>
-<p th:text="'登录用户：'+${user.username}"></p>
-<a href="/device/all">查看设备列表</a>
+<ul th:each="device:${devices}">
+    <li th:text="${device}"></li>
+</ul>
 </body>
 </html>

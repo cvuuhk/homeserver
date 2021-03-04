@@ -1,14 +1,16 @@
 package edu.hhuc.cvuuhk.homeserver.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@Controller
 @RequestMapping("/device")
 public class DeviceController {
-  @GetMapping("/all")
-  public String getAllDevice() {
-    return "todo";
+  @RequestMapping("/all")
+  public String getAllDevice(Model model) {
+    String[] devices = {"123", "456"};
+    model.addAttribute("devices", devices);
+    return "device";
   }
 }
