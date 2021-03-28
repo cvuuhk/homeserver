@@ -1,5 +1,6 @@
 package edu.hhuc.cvuuhk.homeserver.config;
 
+import edu.hhuc.cvuuhk.homeserver.handler.MqttMessageHandler;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,7 +15,6 @@ import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 
-/** MQTT配置，消费者 */
 @Configuration
 public class MqttReceiverConfig {
   /** 订阅的bean名称 */
@@ -33,27 +33,25 @@ public class MqttReceiverConfig {
   @Value("${mqtt.password}")
   private String password;
 
-  @Value("${mqtt.url}")
-  private String url;
+  @Value("${mqtt.urls}")
+  private String urls;
 
   @Value("${mqtt.receiver.clientId}")
   private String clientId;
 
-  @Value("${mqtt.receiver.defaultTopic}")
-  private String defaultTopic;
+  @Value("${mqtt.receiver.defaultTopics}")
+  private String defaultTopics;
 
   /** MQTT连接器选项 */
   @Bean
   public MqttConnectOptions getReceiverMqttConnectOptions() {
     MqttConnectOptions options = new MqttConnectOptions();
     // 设置连接的用户名
-    if (!username.trim().equals("")) {
-      options.setUserName(username);
-    }
+    options.setUserName(username);
     // 设置连接的密码
     options.setPassword(password.toCharArray());
     // 设置连接的地址
-    options.setServerURIs(url.split(","));
+    options.setServerURIs(urls.split(","));
     // 设置超时时间 单位为秒
     options.setConnectionTimeout(10);
     // 设置会话心跳时间 单位为秒 服务器会每隔1.5*20秒的时间向客户端发送心跳判断客户端是否在线
@@ -82,7 +80,7 @@ public class MqttReceiverConfig {
     // 可以同时消费（订阅）多个Topic
     MqttPahoMessageDrivenChannelAdapter adapter =
         new MqttPahoMessageDrivenChannelAdapter(
-            clientId, receiverMqttClientFactory(), defaultTopic.split(","));
+            clientId, receiverMqttClientFactory(), defaultTopics.split(","));
     adapter.setCompletionTimeout(5000);
     adapter.setConverter(new DefaultPahoMessageConverter());
     adapter.setQos(1);
@@ -95,16 +93,6 @@ public class MqttReceiverConfig {
   @Bean
   @ServiceActivator(inputChannel = CHANNEL_NAME_IN)
   public MessageHandler handler() {
-    return message -> {
-      String topic = message.getHeaders().get("mqtt_receivedTopic").toString();
-      String msg = message.getPayload().toString();
-      System.out.println(
-          "\n--------------------START-------------------\n"
-              + "接收到订阅消息:\ntopic:"
-              + topic
-              + "\nmessage:"
-              + msg
-              + "\n---------------------END--------------------");
-    };
+    return new MqttMessageHandler();
   }
 }

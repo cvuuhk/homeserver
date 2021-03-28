@@ -1,7 +1,7 @@
 package edu.hhuc.cvuuhk.homeserver.controller;
 
 import edu.hhuc.cvuuhk.homeserver.repository.UserLoginRepository;
-import edu.hhuc.cvuuhk.homeserver.service.MqttSenderService;
+import edu.hhuc.cvuuhk.homeserver.service.MqttPublishService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +14,7 @@ import java.security.Principal;
 @Controller
 public class DefaultController {
   @Resource UserLoginRepository userLoginRepository;
-  @Resource MqttSenderService mqttSenderService;
+  @Resource MqttPublishService mqttSendService;
 
   @GetMapping("")
   public String index(Model model, Principal principal) {
@@ -27,7 +27,7 @@ public class DefaultController {
   @GetMapping("/mqtt_pub/{data}")
   @ResponseBody
   public String test1(@PathVariable("data") String data) {
-    mqttSenderService.sendToMqtt(data);
+    mqttSendService.publish(data);
     return "发送 mqtt 消息成功，消息内容为：" + data;
   }
 }

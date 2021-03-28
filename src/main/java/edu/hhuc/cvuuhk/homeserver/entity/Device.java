@@ -1,29 +1,79 @@
 package edu.hhuc.cvuuhk.homeserver.entity;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
 
-public interface Device {
-  // 设备id
-  Integer getDeviceId();
+@Entity
+@Table(name = "device")
+public class Device {
 
-  // 获取设备名称
-  String getDeviceName();
+  @Id
+  @Column(name = "deviceName", nullable = false)
+  private String deviceName;
 
-  // 获取设备类型
-  DeviceType getDeviceType();
+  @Column(name = "deviceNameZh")
+  private String deviceNameZh;
 
-  // 获取设备状态，获取的信息与设备类型有关
-  String getDeviceStatus();
+  @Column(name = "type", nullable = false)
+  private String type;
 
-  // 获取设备添加的时间
-  LocalDateTime getDateTime();
+  @Column(name = "comment")
+  private String comment;
 
-  // 开启设备
-  boolean on();
+  @Column(name = "registerDateTime", nullable = false)
+  private LocalDateTime registerDateTime;
 
-  // 关闭设备
-  boolean off();
+  public Device(String deviceName, String deviceNameZh, String type, String comment) {
+    this.registerDateTime = LocalDateTime.now();
+    this.deviceName = deviceName;
+    this.deviceNameZh = deviceNameZh;
+    this.type = type;
+    this.comment = comment;
+  }
 
-  // 执行一些自定义指令
-  boolean action(String action);
+  public Device() {}
+
+  public String getDeviceName() {
+    return deviceName;
+  }
+
+  public String getDeviceNameZh() {
+    return deviceNameZh;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public String getComment() {
+    return comment;
+  }
+
+  public LocalDateTime getRegisterDateTime() {
+    return registerDateTime;
+  }
+
+  @Override
+  public String toString() {
+    return "Device{"
+        + "deviceName="
+        + deviceName
+        + '\''
+        + "deviceNameZh="
+        + deviceNameZh
+        + '\''
+        + "type="
+        + type
+        + '\''
+        + "comment="
+        + comment
+        + '\''
+        + "registerDateTime="
+        + registerDateTime
+        + '\''
+        + '}';
+  }
 }

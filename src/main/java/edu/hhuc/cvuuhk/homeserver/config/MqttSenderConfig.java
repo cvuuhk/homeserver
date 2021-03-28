@@ -30,8 +30,8 @@ public class MqttSenderConfig {
   @Value("${mqtt.password}")
   private String password;
 
-  @Value("${mqtt.url}")
-  private String url;
+  @Value("${mqtt.urls}")
+  private String urls;
 
   @Value("${mqtt.sender.clientId}")
   private String clientId;
@@ -47,10 +47,8 @@ public class MqttSenderConfig {
     if (!username.trim().equals("")) {
       options.setUserName(username);
     }
-    // 设置连接的密码
     options.setPassword(password.toCharArray());
-    // 设置连接的地址
-    options.setServerURIs(url.split(","));
+    options.setServerURIs(urls.split(","));
     // 设置超时时间 单位为秒
     options.setConnectionTimeout(10);
     // 设置会话心跳时间 单位为秒 服务器会每隔1.5*20秒的时间向客户端发送心跳判断客户端是否在线
