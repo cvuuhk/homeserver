@@ -1,9 +1,6 @@
 package edu.hhuc.cvuuhk.homeserver.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,7 +15,8 @@ public class Device {
   private String deviceNameZh;
 
   @Column(name = "type", nullable = false)
-  private String type;
+  @Enumerated(EnumType.STRING)
+  private DeviceType type;
 
   @Column(name = "comment")
   private String comment;
@@ -26,7 +24,7 @@ public class Device {
   @Column(name = "registerDateTime", nullable = false)
   private LocalDateTime registerDateTime;
 
-  public Device(String deviceName, String deviceNameZh, String type, String comment) {
+  public Device(String deviceName, String deviceNameZh, DeviceType type, String comment) {
     this.registerDateTime = LocalDateTime.now();
     this.deviceName = deviceName;
     this.deviceNameZh = deviceNameZh;
@@ -44,7 +42,7 @@ public class Device {
     return deviceNameZh;
   }
 
-  public String getType() {
+  public DeviceType getType() {
     return type;
   }
 

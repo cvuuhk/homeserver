@@ -2,6 +2,9 @@ package edu.hhuc.cvuuhk.homeserver.controller;
 
 import edu.hhuc.cvuuhk.homeserver.entity.Device;
 import edu.hhuc.cvuuhk.homeserver.repository.DeviceRepository;
+import edu.hhuc.cvuuhk.homeserver.service.MqttPublishService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -13,8 +16,10 @@ import java.util.UUID;
 @Controller
 @RequestMapping("/device")
 public class DeviceController {
-
   @Resource DeviceRepository deviceRepository;
+  @Resource MqttPublishService mqttPublishService;
+
+  private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   @RequestMapping("/all")
   public String getAllDevice(Model model) {
@@ -22,27 +27,26 @@ public class DeviceController {
     return "device";
   }
 
-  @PostMapping("/add/{deviceName}")
+  @PostMapping("/add")
   @ResponseBody
-  public String addDevice(
-      @PathVariable("deviceName") String deviceName, @RequestBody String other) {
-    // todo：参数合法性检测
-    if (deviceName == null || !deviceName.matches("\\w{2,32}")) return "请输入正确的 DeviceName！";
-    if (deviceRepository.findDeviceByDeviceName(deviceName) != null) return "与其他设备名称重复！";
+  public String addDevice(@RequestBody Device device) {
 
-    // 解析生成相应 Device
-    String[] args = other.split(",");
-    deviceRepository.save(new Device(deviceName, args[0], args[1], args[2]));
+    deviceRepository.save(device);
 
     UUID password = UUID.randomUUID();
     try {
       Runtime.getRuntime()
-          .exec("mosquitto_passwd -b /etc/mosquitto/passwd" + " " + deviceName + " " + password);
-      Runtime.getRuntime().exec("sudo systemctl restart mosquitto.service");
+          .exec(
+              "mosquitto_passwd -b /etc/mosquitto/passwd"
+                  + " "
+                  + device.getDeviceName()
+                  + " "
+                  + password);
+      Runtime.getRuntime().exec("sudo systemctl reload mosquitto.service");
     } catch (IOException e) {
       e.printStackTrace();
     }
-    return "设备" + deviceName + "添加成功！\n" + "该设备密钥为：" + password;
+    return "设备" + device.getDeviceName() + "添加成功，" + "密钥为：" + password;
   }
 
   @DeleteMapping("/delete/{deviceName}")
@@ -54,11 +58,21 @@ public class DeviceController {
 
     try {
       Runtime.getRuntime().exec("mosquitto_passwd -D /etc/mosquitto/passwd" + " " + deviceName);
-      Runtime.getRuntime().exec("sudo systemctl restart mosquitto.service");
+      Runtime.getRuntime().exec("sudo systemctl reload mosquitto.service");
     } catch (IOException e) {
       e.printStackTrace();
     }
     return "删除成功";
+  }
+
+  @PostMapping("/action/{deviceName}")
+  @ResponseBody
+  public String action(@PathVariable("deviceName") String deviceName, @RequestBody String action) {
+    if (deviceRepository.findDeviceByDeviceName(deviceName) != null) {
+      mqttPublishService.publish("deviceAction", deviceName + ":" + action);
+    }
+
+    return "设备" + deviceName + "执行" + action + "指令";
   }
 
   @GetMapping("/{deviceName}")
