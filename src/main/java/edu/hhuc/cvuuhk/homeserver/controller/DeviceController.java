@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.UUID;
@@ -41,19 +42,30 @@ public class DeviceController {
     actionHistoryRepository.save(
         new ActionHistory(principal.getName(), device.getDeviceName(), "add"));
 
+    logger.info(
+        "用户 "
+            + principal.getName()
+            + " 添加设备："
+            + device.getDeviceName()
+            + "，类型："
+            + device.getType().name()
+            + "，密钥："
+            + password);
     return "设备" + device.getDeviceName() + "添加成功，" + "密钥为：" + password;
   }
 
   @DeleteMapping("/delete/{deviceName}")
   @ResponseBody
-  public String deleteDevice(@PathVariable("deviceName") String deviceName) {
+  @Transactional
+  public String deleteDevice(@PathVariable("deviceName") String deviceName, Principal principal) {
     Device device = deviceRepository.findDeviceByDeviceName(deviceName);
     if (device == null) return "没有该设备";
     actionHistoryRepository.deleteActionHistoriesByDeviceName(deviceName);
     deviceRepository.delete(device);
     mosquittoDeleteUser(deviceName);
 
-    return "删除成功";
+    logger.info("用户 " + principal.getName() + " 删除设备 " + device.getDeviceName());
+    return "设备 " + deviceName + " 删除成功";
   }
 
   @PostMapping("/action/{deviceName}")
@@ -67,6 +79,7 @@ public class DeviceController {
       actionHistoryRepository.save(new ActionHistory(principal.getName(), deviceName, action));
     }
 
+    logger.info("用户 " + principal.getName() + " 使设备 " + deviceName + " 执行 " + action + " 指令");
     return "设备" + deviceName + "执行" + action + "指令";
   }
 
