@@ -45,6 +45,22 @@ public class DeviceController {
     return "设备" + deviceName + "添加成功！\n" + "该设备密钥为：" + password;
   }
 
+  @DeleteMapping("/delete/{deviceName}")
+  @ResponseBody
+  public String deleteDevice(@PathVariable("deviceName") String deviceName) {
+    Device device = deviceRepository.findDeviceByDeviceName(deviceName);
+    if (device == null) return "没有该设备";
+    deviceRepository.delete(device);
+
+    try {
+      Runtime.getRuntime().exec("mosquitto_passwd -D /etc/mosquitto/passwd" + " " + deviceName);
+      Runtime.getRuntime().exec("sudo systemctl restart mosquitto.service");
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return "删除成功";
+  }
+
   @GetMapping("/{deviceName}")
   @ResponseBody
   public Device getDeviceByDeviceName(@PathVariable("deviceName") String deviceName) {
