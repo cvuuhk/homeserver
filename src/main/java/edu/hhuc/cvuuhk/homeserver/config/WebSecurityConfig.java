@@ -17,21 +17,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    //    http.authorizeRequests()
-    //        .antMatchers("/login")
-    //        .permitAll()
-    //        .antMatchers("/device/**", "/user/**")
-    //        .permitAll()
-    //        //        .hasRole("user")
-    //        .anyRequest()
-    //        .authenticated()
-    //        .and()
-    //        .formLogin()
-    //        .defaultSuccessUrl("/device/all")
-    //        .and()
-    //        .csrf()
-    //        .disable();
-    http.authorizeRequests().antMatchers("/**").permitAll().and().csrf().disable();
+    http.httpBasic()
+        .and()
+        .authorizeRequests()
+        .antMatchers("/login")
+        .permitAll()
+        .antMatchers("/device/**", "/user/**")
+        .hasRole("user")
+        .anyRequest()
+        .authenticated()
+        .and()
+        .formLogin()
+        .defaultSuccessUrl("/device/all")
+        .and()
+        .csrf()
+        .disable();
   }
 
   @Override

@@ -12,8 +12,8 @@ import javax.annotation.Resource;
 
 @Service
 public class UserLoginService implements UserDetailsService {
-  @Resource UserLoginRepository repository;
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
+  @Resource UserLoginRepository repository;
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -22,7 +22,7 @@ public class UserLoginService implements UserDetailsService {
       throw new UsernameNotFoundException("账户" + username + "不存在");
     }
 
-    logger.info("用户" + username + "登录成功");
+    logger.info("用户" + username + "登录");
     return details;
   }
 }

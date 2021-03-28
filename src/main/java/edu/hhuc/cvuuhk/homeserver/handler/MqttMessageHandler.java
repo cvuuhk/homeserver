@@ -12,9 +12,9 @@ import org.springframework.messaging.MessagingException;
 import javax.annotation.Resource;
 
 public class MqttMessageHandler implements MessageHandler {
+  private final Logger logger = LoggerFactory.getLogger(this.getClass());
   @Resource DeviceRepository deviceRepository;
   @Resource DeviceHistoryRepository deviceHistoryRepository;
-  private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   @Override
   public void handleMessage(Message<?> message) throws MessagingException {

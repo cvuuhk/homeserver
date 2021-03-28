@@ -1,7 +1,7 @@
 package edu.hhuc.cvuuhk.homeserver.entity;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "action_history")
@@ -19,22 +19,26 @@ public class ActionHistory {
   private String action;
 
   @Column(name = "datetime", nullable = false)
-  private Date datetime;
+  private LocalDateTime datetime;
 
   @Column(name = "username", nullable = false)
   private String username;
 
-  public ActionHistory setId(Integer id) {
-    this.id = id;
-    return this;
+  public ActionHistory() {}
+
+  public ActionHistory(String username, String deviceName, String action) {
+    this.deviceName = deviceName;
+    this.action = action;
+    this.username = username;
+    this.datetime = LocalDateTime.now();
   }
 
   public Integer getId() {
     return id;
   }
 
-  public ActionHistory setDeviceName(String deviceName) {
-    this.deviceName = deviceName;
+  public ActionHistory setId(Integer id) {
+    this.id = id;
     return this;
   }
 
@@ -42,8 +46,8 @@ public class ActionHistory {
     return deviceName;
   }
 
-  public ActionHistory setAction(String action) {
-    this.action = action;
+  public ActionHistory setDeviceName(String deviceName) {
+    this.deviceName = deviceName;
     return this;
   }
 
@@ -51,22 +55,27 @@ public class ActionHistory {
     return action;
   }
 
-  public ActionHistory setDatetime(Date datetime) {
-    this.datetime = datetime;
+  public ActionHistory setAction(String action) {
+    this.action = action;
     return this;
   }
 
-  public Date getDatetime() {
+  public LocalDateTime getDatetime() {
     return datetime;
   }
 
-  public ActionHistory setUsername(String username) {
-    this.username = username;
+  public ActionHistory setDatetime(LocalDateTime datetime) {
+    this.datetime = datetime;
     return this;
   }
 
   public String getUsername() {
     return username;
+  }
+
+  public ActionHistory setUsername(String username) {
+    this.username = username;
+    return this;
   }
 
   @Override

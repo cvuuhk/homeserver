@@ -29,17 +29,12 @@ public class DeviceHistory {
 
   public DeviceHistory() {}
 
-  public DeviceHistory setId(Integer id) {
-    this.id = id;
-    return this;
-  }
-
   public Integer getId() {
     return id;
   }
 
-  public DeviceHistory setDeviceName(String deviceName) {
-    this.deviceName = deviceName;
+  public DeviceHistory setId(Integer id) {
+    this.id = id;
     return this;
   }
 
@@ -47,8 +42,8 @@ public class DeviceHistory {
     return deviceName;
   }
 
-  public DeviceHistory setDatetime(LocalDateTime datetime) {
-    this.datetime = datetime;
+  public DeviceHistory setDeviceName(String deviceName) {
+    this.deviceName = deviceName;
     return this;
   }
 
@@ -56,13 +51,18 @@ public class DeviceHistory {
     return datetime;
   }
 
-  public DeviceHistory setStatus(String status) {
-    this.status = status;
+  public DeviceHistory setDatetime(LocalDateTime datetime) {
+    this.datetime = datetime;
     return this;
   }
 
   public String getStatus() {
     return status;
+  }
+
+  public DeviceHistory setStatus(String status) {
+    this.status = status;
+    return this;
   }
 
   @Override
