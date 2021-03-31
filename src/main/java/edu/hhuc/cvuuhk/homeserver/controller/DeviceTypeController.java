@@ -29,7 +29,7 @@ public class DeviceTypeController {
     final String typename = type.getName();
 
     log.info("用户：" + username + "尝试新建设备类型：" + typename);
-    repository.save(type);
+    service.add(type);
     log.info("用户：" + username + "新建设备类型：" + typename);
 
     return "添加" + typename + "成功";

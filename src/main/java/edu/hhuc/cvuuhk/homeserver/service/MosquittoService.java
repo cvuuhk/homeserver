@@ -21,6 +21,7 @@ public class MosquittoService {
     reload();
   }
 
+  //todo
   private void reload() throws IOException {
     Runtime.getRuntime().exec("sudo systemctl reload mosquitto.service");
     log.info("重载 mosquitto");

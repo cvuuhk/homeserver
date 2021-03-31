@@ -1,5 +1,7 @@
 package edu.hhuc.cvuuhk.homeserver.handler;
 
+import edu.hhuc.cvuuhk.homeserver.exception.DeviceException;
+import edu.hhuc.cvuuhk.homeserver.exception.InstructionException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,5 +16,15 @@ public class ArgumentParseExceptionHandler {
     return e.getBindingResult().getFieldError().getDefaultMessage();
   }
 
-  // todo：解析失败 handler
+  @ResponseBody
+  @ExceptionHandler(DeviceException.class)
+  public String handleDeviceException(DeviceException e) {
+    return e.getMessage();
+  }
+
+  @ResponseBody
+  @ExceptionHandler(InstructionException.class)
+  public String handleInstructionException(InstructionException e) {
+    return e.getMessage();
+  }
 }

@@ -6,6 +6,7 @@ import edu.hhuc.cvuuhk.homeserver.entity.Instruction;
 import edu.hhuc.cvuuhk.homeserver.exception.DeviceException;
 import edu.hhuc.cvuuhk.homeserver.repository.DeviceRepository;
 import edu.hhuc.cvuuhk.homeserver.repository.DeviceStatusRepository;
+import edu.hhuc.cvuuhk.homeserver.repository.DeviceTypeRepository;
 import edu.hhuc.cvuuhk.homeserver.repository.ExecuteHistoryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,11 +21,15 @@ public class DeviceService {
   @Resource DeviceRepository repository;
   @Resource ExecuteHistoryRepository executeHistoryRepository;
   @Resource DeviceStatusRepository deviceStatusRepository;
+  @Resource DeviceTypeRepository deviceTypeRepository;
 
   @Resource MqttPublishService mqttPublishService;
 
   @Transactional
   public void addDevice(Device device) {
+    if (repository.findDeviceByName(device.getName()) != null) throw new DeviceException("该设备已存在");
+    if (deviceTypeRepository.findDeviceTypeByName(device.getType()) == null)
+      throw new DeviceException("设备类型错误");
     log.info("添加设备：" + device.getName());
     repository.save(device);
   }
