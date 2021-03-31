@@ -1,112 +1,87 @@
 package edu.hhuc.cvuuhk.homeserver.controller;
 
-import edu.hhuc.cvuuhk.homeserver.entity.ActionHistory;
 import edu.hhuc.cvuuhk.homeserver.entity.Device;
-import edu.hhuc.cvuuhk.homeserver.repository.ActionHistoryRepository;
-import edu.hhuc.cvuuhk.homeserver.repository.DeviceRepository;
-import edu.hhuc.cvuuhk.homeserver.service.MqttPublishService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import edu.hhuc.cvuuhk.homeserver.entity.Instruction;
+import edu.hhuc.cvuuhk.homeserver.request_body.ExecuteBody;
+import edu.hhuc.cvuuhk.homeserver.service.DeviceService;
+import edu.hhuc.cvuuhk.homeserver.service.InstructionService;
+import edu.hhuc.cvuuhk.homeserver.service.MosquittoService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.UUID;
 
+@Slf4j
 @Controller
 @RequestMapping("/device")
 public class DeviceController {
-  private final Logger logger = LoggerFactory.getLogger(this.getClass());
-  @Resource DeviceRepository deviceRepository;
-  @Resource MqttPublishService mqttPublishService;
-  @Resource ActionHistoryRepository actionHistoryRepository;
+  @Resource DeviceService service;
+  @Resource InstructionService instructionService;
+  @Resource MosquittoService mosquittoService;
 
   @RequestMapping("/all")
   public String getAllDevice(Model model) {
-    model.addAttribute("devices", deviceRepository.findAll());
+    model.addAttribute("devices", service.getAll());
     return "device";
   }
 
   @PostMapping("/add")
   @ResponseBody
-  public String addDevice(@RequestBody Device device, Principal principal) {
+  public String addDevice(@RequestBody @Validated Device device, Principal principal)
+      throws IOException {
+    final String username = principal.getName();
+    log.info("用户：" + username + "尝试添加设备：" + device.getName());
 
-    deviceRepository.save(device);
+    service.addDevice(device);
+    final String password = UUID.randomUUID().toString();
+    final String deviceName = device.getName();
+    mosquittoService.AddUser(deviceName, password);
+    log.info("用户：" + deviceName + "添加设备：" + device.getName() + "成功，" + "密钥：" + password);
 
-    UUID password = UUID.randomUUID();
-    mosquittoAddUser(device.getDeviceName(), password.toString());
-    actionHistoryRepository.save(
-        new ActionHistory(principal.getName(), device.getDeviceName(), "add"));
-
-    logger.info(
-        "用户 "
-            + principal.getName()
-            + " 添加设备："
-            + device.getDeviceName()
-            + "，类型："
-            + device.getType().name()
-            + "，密钥："
-            + password);
-    return "设备" + device.getDeviceName() + "添加成功，" + "密钥为：" + password;
+    return "设备：" + deviceName + "添加成功，" + "密钥：" + password;
   }
 
-  @DeleteMapping("/delete/{deviceName}")
+  @PostMapping("/delete")
   @ResponseBody
-  @Transactional
-  public String deleteDevice(@PathVariable("deviceName") String deviceName, Principal principal) {
-    Device device = deviceRepository.findDeviceByDeviceName(deviceName);
-    if (device == null) return "没有该设备";
-    actionHistoryRepository.deleteActionHistoriesByDeviceName(deviceName);
-    deviceRepository.delete(device);
-    mosquittoDeleteUser(deviceName);
+  public String deleteDevice(@RequestBody @Validated Device device, Principal principal)
+      throws IOException {
+    final String username = principal.getName();
+    final String deviceName = device.getName();
+    log.info("用户：" + username + "尝试删除设备：" + deviceName);
 
-    logger.info("用户 " + principal.getName() + " 删除设备 " + device.getDeviceName());
-    return "设备 " + deviceName + " 删除成功";
+    service.deleteDevice(device);
+    mosquittoService.DeleteUser(deviceName);
+
+    log.info("用户：" + username + "删除设备：" + deviceName + "成功");
+    return "设备：" + deviceName + "删除成功";
   }
 
-  @PostMapping("/action/{deviceName}")
+  @PostMapping("/execute")
   @ResponseBody
-  public String action(
-      @PathVariable("deviceName") String deviceName,
-      @RequestBody String action,
-      Principal principal) {
-    if (deviceRepository.findDeviceByDeviceName(deviceName) != null) {
-      mqttPublishService.publish("deviceAction", deviceName + ":" + action);
-      actionHistoryRepository.save(new ActionHistory(principal.getName(), deviceName, action));
-    }
+  public String execute(@RequestBody @Validated ExecuteBody body, Principal principal) {
+    final String username = principal.getName();
+    final String deviceName = body.getDeviceName();
+    final String instructionName = body.getInstructionName();
+    final String arg = body.getArg();
+    final Device device = service.getDeviceByName(deviceName);
+    final Instruction instruction = instructionService.getInstructionByName(instructionName);
+    log.info("用户：" + username + "尝试操作设备：" + deviceName + "执行：" + instructionName + " " + arg);
 
-    logger.info("用户 " + principal.getName() + " 使设备 " + deviceName + " 执行 " + action + " 指令");
-    return "设备" + deviceName + "执行" + action + "指令";
+    service.execute(username, device, instruction, arg);
+
+    log.info("用户：" + username + "操作设备 " + deviceName + " 执行：" + instructionName + " " + arg);
+    return "执行成功";
   }
 
   @GetMapping("/{deviceName}")
   @ResponseBody
-  public Device getDeviceByDeviceName(
-      @PathVariable("deviceName") String deviceName, Principal principal) {
-    System.out.println(principal.getName());
-    return deviceRepository.findDeviceByDeviceName(deviceName);
-  }
-
-  private void mosquittoAddUser(String username, String password) {
-    try {
-      Runtime.getRuntime()
-          .exec("mosquitto_passwd -b /etc/mosquitto/passwd" + " " + username + " " + password);
-      Runtime.getRuntime().exec("sudo systemctl reload mosquitto.service");
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  private void mosquittoDeleteUser(String username) {
-    try {
-      Runtime.getRuntime().exec("mosquitto_passwd -D /etc/mosquitto/passwd" + " " + username);
-      Runtime.getRuntime().exec("sudo systemctl reload mosquitto.service");
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+  public Device getDeviceByDeviceName(@PathVariable("deviceName") String deviceName) {
+    return service.getDeviceByName(deviceName);
   }
 }
