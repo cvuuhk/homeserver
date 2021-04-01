@@ -6,10 +6,7 @@ import edu.hhuc.cvuuhk.homeserver.service.InstructionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.security.Principal;
@@ -33,14 +30,14 @@ public class InstructionController {
     return "添加：" + instructionName + "成功";
   }
 
-  @PostMapping("/delete")
+  @PostMapping("/delete/{name}")
   @ResponseBody
-  public String delete(@RequestBody @Validated Instruction instruction, Principal principal) {
+  public String delete(@PathVariable("name") String name, Principal principal) {
     final String username = principal.getName();
-    final String instructionName = instruction.getName();
-    log.info("用户：" + username + "尝试删除指令：" + instructionName);
+    final Instruction instruction = service.getInstructionByName(name);
+    log.info("用户：" + username + "尝试删除指令：" + name);
     service.delete(instruction);
-    log.info("用户：" + username + "删除指令：" + instructionName);
-    return "删除：" + instructionName + "成功";
+    log.info("用户：" + username + "删除指令：" + name);
+    return "删除：" + name + "成功";
   }
 }

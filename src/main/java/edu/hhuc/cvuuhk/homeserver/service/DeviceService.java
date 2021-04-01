@@ -4,10 +4,7 @@ import edu.hhuc.cvuuhk.homeserver.entity.Device;
 import edu.hhuc.cvuuhk.homeserver.entity.ExecuteHistory;
 import edu.hhuc.cvuuhk.homeserver.entity.Instruction;
 import edu.hhuc.cvuuhk.homeserver.exception.DeviceException;
-import edu.hhuc.cvuuhk.homeserver.repository.DeviceRepository;
-import edu.hhuc.cvuuhk.homeserver.repository.DeviceStatusRepository;
-import edu.hhuc.cvuuhk.homeserver.repository.DeviceTypeRepository;
-import edu.hhuc.cvuuhk.homeserver.repository.ExecuteHistoryRepository;
+import edu.hhuc.cvuuhk.homeserver.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -22,21 +19,27 @@ public class DeviceService {
   @Resource ExecuteHistoryRepository executeHistoryRepository;
   @Resource DeviceStatusRepository deviceStatusRepository;
   @Resource DeviceTypeRepository deviceTypeRepository;
+  @Resource UserLoginRepository userLoginRepository;
 
   @Resource MqttPublishService mqttPublishService;
 
   @Transactional
   public void addDevice(Device device) {
-    if (repository.findDeviceByName(device.getName()) != null) throw new DeviceException("该设备已存在");
     if (deviceTypeRepository.findDeviceTypeByName(device.getType()) == null)
       throw new DeviceException("设备类型错误");
-    log.info("添加设备：" + device.getName());
+    final String username = device.getCreateBy();
+    if (userLoginRepository.findUserLoginByUsername(username) == null)
+      throw new DeviceException("设备创建人错误，没有用户：" + device.getCreateBy());
+    if (repository.findDeviceByName(device.getName()) != null) throw new DeviceException("该设备已存在");
+
     repository.save(device);
+    log.info("添加设备：" + device.getName());
   }
 
   @Transactional
   public void deleteDevice(Device device) {
     final String deviceName = device.getName();
+
     executeHistoryRepository.deleteAllByDeviceName(deviceName);
     log.info("删除设备：" + deviceName + "的指令执行记录");
     deviceStatusRepository.deleteAllByDeviceName(deviceName);
@@ -55,6 +58,7 @@ public class DeviceService {
     return repository.findAll();
   }
 
+  @Transactional
   public void execute(String username, Device device, Instruction instruction, String arg) {
     if (!device.getType().equals(instruction.getType())) {
       throw new DeviceException("该设备无法执行其他类型设备的指令");
@@ -70,6 +74,4 @@ public class DeviceService {
     executeHistoryRepository.save(new ExecuteHistory(deviceName, instructionId, arg, username));
     log.info("用户：" + username + "操作设备：" + deviceName + "执行：" + instructionName + " " + arg);
   }
-
-  private void check(Device device) throws DeviceException {}
 }

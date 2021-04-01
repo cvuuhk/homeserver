@@ -6,10 +6,7 @@ import edu.hhuc.cvuuhk.homeserver.service.DeviceTypeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.security.Principal;
@@ -35,11 +32,11 @@ public class DeviceTypeController {
     return "添加" + typename + "成功";
   }
 
-  @PostMapping("/delete")
+  @PostMapping("/delete/{typename}")
   @ResponseBody
-  public String delete(@RequestBody @Validated DeviceType type, Principal principal) {
+  public String delete(@PathVariable("typename") String typename, Principal principal) {
     final String username = principal.getName();
-    final String typename = type.getName();
+    final DeviceType type = service.getDeviceTypeByName(typename);
     log.info("用户：" + username + "尝试删除设备类型：" + typename);
 
     service.delete(type);

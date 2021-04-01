@@ -42,23 +42,22 @@ public class DeviceController {
     final String password = UUID.randomUUID().toString();
     final String deviceName = device.getName();
     mosquittoService.AddUser(deviceName, password);
-    log.info("用户：" + deviceName + "添加设备：" + device.getName() + "成功，" + "密钥：" + password);
+    log.info("用户：" + username + "添加设备：" + device.getName() + "密钥：" + password);
 
     return "设备：" + deviceName + "添加成功，" + "密钥：" + password;
   }
 
-  @PostMapping("/delete")
+  @PostMapping("/delete/{devicename}")
   @ResponseBody
-  public String deleteDevice(@RequestBody @Validated Device device, Principal principal)
+  public String deleteDevice(@PathVariable("devicename") String deviceName, Principal principal)
       throws IOException {
     final String username = principal.getName();
-    final String deviceName = device.getName();
+    final Device device = service.getDeviceByName(deviceName);
     log.info("用户：" + username + "尝试删除设备：" + deviceName);
 
     service.deleteDevice(device);
     mosquittoService.DeleteUser(deviceName);
 
-    log.info("用户：" + username + "删除设备：" + deviceName + "成功");
     return "设备：" + deviceName + "删除成功";
   }
 
