@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>设备类型</title>
+    <script src="/ajax.js"></script>
+    <script>
+        function deleteType() {
+            let typename = document.getElementById("type_name").attributes["value"].value;
+            ajaxPost("/type/delete/" + typename, "", function (req) {
+                alert(req)
+            })
+        }
+
+        function addDevice() {
+            let select = document.getElementById("device_select_type");
+            let index = select.selectedIndex;
+            let device = {
+                "name": document.getElementById("device_name").value,
+                "comment": document.getElementById("device_comment").value,
+                "createBy": document.getElementById("user").attributes["value"].value,
+                "type": select.options[index].value
+            }
+            // console.log(JSON.stringify(type));
+            ajaxPost("/device/add", device, function (req) {
+                alert(req)
+            })
+        }
+
+        function addIns() {
+            let select = document.getElementById("ins_select_type");
+            let index = select.selectedIndex;
+            let ins = {
+                "name": document.getElementById("ins_name").value,
+                "comment": document.getElementById("ins_comment").value,
+                "createBy": document.getElementById("user").attributes["value"].value,
+                "type": select.options[index].value
+            }
+            // console.log(JSON.stringify(type));
+            ajaxPost("/ins/add", ins, function (req) {
+                alert(req)
+            })
+        }
+
+        function exe() {
+            let select_device = document.getElementById("device_exe");
+            let index_device = select_device.selectedIndex;
+
+            let select_ins = document.getElementById("ins_exe");
+            let index_ins = select_ins.selectedIndex;
+
+            let data = {
+                "deviceName": select_device.options[index_device].value,
+                "instructionId": select_ins.options[index_ins].value,
+                "arg": document.getElementById("arg").value,
+            }
+            console.log(data);
+            ajaxPost("/device/execute", data, function (req) {
+                alert(req)
+            })
+        }
+
+    </script>
+</head>
+<!-- types current_type user devices all_ins-->
+<body>
+<p id="user" th:value="${user.username}" th:text="'当前登录用户：'+${user.username}"></p>
+
+<br>
+<div style="border-style: solid">
+    类型名：<span th:id="type_name" th:value="${current_type.name}" th:text="${current_type.name}"></span><br>
+    说明：<span th:text="${current_type.comment}"></span><br>
+    创建人：<span th:text="${current_type.createBy}"></span><br>
+    创建时间：<span th:text="${current_type.createTime}"></span><br>
+    <button onclick="deleteType()">删除当前类型</button>
+</div>
+
+
+<br>
+<div style="border-style: solid">
+    <div>管理设备</div>
+    <div th:each="device:${devices}">
+        <a th:href="'/device/'+${device.name}"><span th:text="${device.name}"></span></a>
+    </div>
+</div>
+
+<br>
+<div style="border-style: solid">
+    <div>新建设备</div>
+    <form>
+        device name:<input id="device_name" required>（必填）<br>
+        comment:<input id="device_comment">（可选）<br>
+        所属类型：<select id="device_select_type">
+        <option th:each="type:${types}" th:value="${type.name}"><span th:text="${type.name}"></span></option>
+    </select>
+    </form>
+    <button onclick="addDevice()">提交</button>
+</div>
+
+
+<br>
+<div style="border-style: solid">
+    <div>管理指令</div>
+    <div th:each="ins:${all_ins}">
+        <a th:href="'/ins/'+${ins.id}"><span th:text="${ins.name}"></span></a>
+    </div>
+</div>
+
+<br>
+<div style="border-style: solid">
+    <div>新建指令</div>
+    <form>
+        instruction name:<input id="ins_name" required>（必填）<br>
+        comment:<input id="ins_comment">（可选）<br>
+        所属类型：<select id="ins_select_type">
+        <option th:each="type:${types}" th:value="${type.name}"><span th:text="${type.name}"></span></option>
+    </select>
+    </form>
+    <button onclick="addIns()">提交</button>
+</div>
+
+
+<br>
+<div style="border-style: solid">
+    <div>执行指令</div>
+    <form>
+        设备：<select id="device_exe">
+        <option th:each="device:${devices}" th:value="${device.name}"><span th:text="${device.name}"></span></option>
+
+    </select>
+        指令：<select id="ins_exe">
+        <option th:each="ins:${all_ins}" th:value="${ins.id}"><span th:text="|${ins.name},id:${ins.id}|"></span>
+        </option>
+    </select>
+        参数：<input id="arg">（可选）
+    </form>
+    <button onclick="exe()">执行</button>
+</div>
+</body>
+</html>

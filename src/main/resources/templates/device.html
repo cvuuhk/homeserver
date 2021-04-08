@@ -1,12 +1,30 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>设备信息</title>
+    <title>设备管理</title>
+    <script src="/ajax.js"></script>
+    <script>
+        function deleteDevice() {
+            let device_name = document.getElementById("device_name").attributes["value"].value;
+            ajaxPost("/device/delete/" + device_name, "", function (req) {
+                alert(req)
+            })
+        }
+
+    </script>
 </head>
+
+<!-- current_device-->
 <body>
-<ul th:each="device:${devices}">
-    <li th:text="${device}"></li>
-</ul>
+<div style="border-style: solid">
+    设备名：<span th:id="device_name" th:value="${current_device.name}" th:text="${current_device.name}"></span><br>
+    说明：<span th:text="${current_device.comment}"></span><br>
+    所属类型：<span th:text="${current_device.type}"></span><br>
+    创建人：<span th:text="${current_device.createBy}"></span><br>
+    创建时间：<span th:text="${current_device.createTime}"></span><br>
+    <button onclick="deleteDevice()">删除当前设备</button>
+</div>
+
 </body>
 </html>

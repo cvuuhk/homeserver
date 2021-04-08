@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>指令管理</title>
+    <script src="/ajax.js"></script>
+    <script>
+        function deleteIns() {
+            let ins_id = document.getElementById("ins_id").attributes["value"].value;
+            ajaxPost("/ins/delete/" + ins_id, "", function (req) {
+                alert(req);
+            })
+
+        }
+
+    </script>
+</head>
+<body>
+<div style="border-style: solid">
+    <div>指令信息</div>
+    id:<span th:id="ins_id" th:value="${ins.id}" th:text="${ins.id}"></span><br>
+    name:<span th:text="${ins.name}"></span><br>
+    type:<span th:text="${ins.type}"></span><br>
+    comment:<span th:text="${ins.comment}"></span><br>
+    create by:<span th:text="${ins.createBy}"></span><br>
+    <button onclick="deleteIns()">删除当前指令</button>
+</div>
+<br>
+</body>
+</html>

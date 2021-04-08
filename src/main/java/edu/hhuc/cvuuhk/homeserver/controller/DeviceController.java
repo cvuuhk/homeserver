@@ -25,9 +25,9 @@ public class DeviceController {
   @Resource InstructionService instructionService;
   @Resource MosquittoService mosquittoService;
 
-  @RequestMapping("/all")
-  public String getAllDevice(Model model) {
-    model.addAttribute("devices", service.getAll());
+  @GetMapping("/{device_name}")
+  public String getAllDevice(@PathVariable("device_name") String deviceName, Model model) {
+    model.addAttribute("current_device", service.getDeviceByName(deviceName));
     return "device";
   }
 
@@ -66,21 +66,16 @@ public class DeviceController {
   public String execute(@RequestBody @Validated ExecuteBody body, Principal principal) {
     final String username = principal.getName();
     final String deviceName = body.getDeviceName();
-    final String instructionName = body.getInstructionName();
+    final Integer instructionId = body.getInstructionId();
     final String arg = body.getArg();
     final Device device = service.getDeviceByName(deviceName);
-    final Instruction instruction = instructionService.getInstructionByName(instructionName);
-    log.info("用户：" + username + "尝试操作设备：" + deviceName + "执行：" + instructionName + " " + arg);
+    final Instruction instruction = instructionService.getInstructionById(instructionId);
+
+    log.info("用户：" + username + "尝试操作设备：" + deviceName + "执行：" + instructionId + "号指令，参数：" + arg);
 
     service.execute(username, device, instruction, arg);
 
-    log.info("用户：" + username + "操作设备 " + deviceName + " 执行：" + instructionName + " " + arg);
+    log.info("用户：" + username + "操作设备 " + deviceName + " 执行：" + instructionId + "号指令，参数：" + arg);
     return "执行成功";
-  }
-
-  @GetMapping("/{deviceName}")
-  @ResponseBody
-  public Device getDeviceByDeviceName(@PathVariable("deviceName") String deviceName) {
-    return service.getDeviceByName(deviceName);
   }
 }

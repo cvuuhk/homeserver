@@ -1,10 +1,14 @@
 package edu.hhuc.cvuuhk.homeserver.controller;
 
 import edu.hhuc.cvuuhk.homeserver.entity.DeviceType;
+import edu.hhuc.cvuuhk.homeserver.repository.DeviceRepository;
 import edu.hhuc.cvuuhk.homeserver.repository.DeviceTypeRepository;
+import edu.hhuc.cvuuhk.homeserver.repository.InstructionRepository;
+import edu.hhuc.cvuuhk.homeserver.repository.UserLoginRepository;
 import edu.hhuc.cvuuhk.homeserver.service.DeviceTypeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +22,21 @@ public class DeviceTypeController {
 
   @Resource DeviceTypeRepository repository;
   @Resource DeviceTypeService service;
+
+  @Resource DeviceRepository deviceRepository;
+  @Resource InstructionRepository instructionRepository;
+  @Resource UserLoginRepository userLoginRepository;
+
+  @GetMapping(value = "/{typename}")
+  public String index(@PathVariable("typename") String typename, Principal principal, Model model) {
+    model.addAttribute("types", repository.findAll());
+    model.addAttribute("current_type", repository.findDeviceTypeByName(typename));
+    model.addAttribute("user", userLoginRepository.findUserLoginByUsername(principal.getName()));
+    model.addAttribute("devices", deviceRepository.findDevicesByType(typename));
+    model.addAttribute("all_ins", instructionRepository.findInstructionsByType(typename));
+
+    return "type";
+  }
 
   @PostMapping("/add")
   @ResponseBody

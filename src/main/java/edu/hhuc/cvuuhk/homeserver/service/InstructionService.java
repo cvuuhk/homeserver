@@ -41,8 +41,8 @@ public class InstructionService {
     log.info("删除指令：" + name);
   }
 
-  public Instruction getInstructionByName(String instructionName) throws InstructionException {
-    Instruction instruction = repository.findInstructionByName(instructionName);
+  public Instruction getInstructionById(Integer id) throws InstructionException {
+    Instruction instruction = repository.findInstructionById(id);
     if (instruction == null) throw new InstructionException("没有该指令");
     return instruction;
   }

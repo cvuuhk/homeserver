@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Set;
 
 public interface InstructionRepository extends JpaRepository<Instruction, Integer> {
-  Instruction findInstructionByName(String instructionName);
+  Instruction findInstructionById(Integer id);
+
   Set<Instruction> findInstructionsByType(String type);
 }

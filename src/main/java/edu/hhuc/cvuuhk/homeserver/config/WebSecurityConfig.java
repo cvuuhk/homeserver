@@ -20,7 +20,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     http.httpBasic()
         .and()
         .authorizeRequests()
-        .antMatchers("/login")
+        .antMatchers("/login","/static/**")
         .permitAll()
         .antMatchers("/device/**", "/user/**")
         .hasRole("user")
@@ -32,6 +32,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .and()
         .csrf()
         .disable();
+    http.headers().contentTypeOptions().disable();
   }
 
   @Override

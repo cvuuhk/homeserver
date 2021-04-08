@@ -1,11 +1,49 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <title>主页</title>
+    <script src="/ajax.js"></script>
+    <script>
+        function addType() {
+            let type = {
+                "name": document.getElementById("type_name").value,
+                "comment": document.getElementById("type_comment").value,
+                "createBy": document.getElementById("user").attributes["value"].value
+            }
+            // console.log(JSON.stringify(type));
+            ajaxPost("/type/add", type, function (req) {
+                alert(req)
+            })
+        }
+    </script>
 </head>
+
 <body>
-<p th:text="'登录用户：'+${user.username}"></p>
-<a href="/device/all">查看设备列表</a>
+<p id="user" th:value="${user.username}" th:text="'当前登录用户：'+${user.username}"></p>
+<div style="border-style: solid">
+    <div>管理设备类型</div>
+    <div th:each="type:${types}">
+        <a th:href="|/type/${type.name}|"><span th:text="${type.name}"></span></a>
+    </div>
+</div>
+<br>
+
+<div style="border-style: solid">
+    <div>新建设备类型</div>
+    <form>
+        type name:<input id="type_name" required>（必填）<br>
+        comment:<input id="type_comment">（可选）<br>
+    </form>
+    <button onclick="addType()">提交</button>
+</div>
+
+<br>
+<div style="border-style: solid">
+    <div>日志</div>
+    <p th:each="log:${logs}"
+       th:text="|用户${log.executeBy}操作设备${log.deviceName}执行${log.instructionId}号指令，参数:${log.arg}，时间:${log.datetime}|"></p>
+</div>
+
 </body>
 </html>
