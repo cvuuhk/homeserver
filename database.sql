@@ -1,6 +1,6 @@
 -- MariaDB dump 10.19  Distrib 10.5.9-MariaDB, for Linux (x86_64)
 --
--- Host: 127.0.0.1    Database: server
+-- Host: localhost    Database: server
 -- ------------------------------------------------------
 -- Server version	10.5.9-MariaDB
 
@@ -42,6 +42,7 @@ CREATE TABLE `device` (
 
 LOCK TABLES `device` WRITE;
 /*!40000 ALTER TABLE `device` DISABLE KEYS */;
+INSERT INTO `device` VALUES ('asdasd','goooo','','cui','2021-04-20 09:15:47');
 /*!40000 ALTER TABLE `device` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -60,7 +61,7 @@ CREATE TABLE `device_status` (
   PRIMARY KEY (`id`),
   KEY `device_status_device_name_fk` (`device_name`),
   CONSTRAINT `device_status_device_name_fk` FOREIGN KEY (`device_name`) REFERENCES `device` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -84,7 +85,9 @@ CREATE TABLE `device_type` (
   `comment` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `create_by` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
   `create_time` datetime NOT NULL,
-  PRIMARY KEY (`name`)
+  PRIMARY KEY (`name`),
+  KEY `device_type_login_username_fk` (`create_by`),
+  CONSTRAINT `device_type_login_username_fk` FOREIGN KEY (`create_by`) REFERENCES `login` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -94,7 +97,7 @@ CREATE TABLE `device_type` (
 
 LOCK TABLES `device_type` WRITE;
 /*!40000 ALTER TABLE `device_type` DISABLE KEYS */;
-INSERT INTO `device_type` VALUES ('sensor','传感器类型，平台只能被动接收设备数据，无法对设备发送指令','cui','2021-03-30 20:18:04'),('switch','开关型设备，即设备只支持开和关两种指令','cui','2021-03-30 20:18:50');
+INSERT INTO `device_type` VALUES ('goooo','','cui','2021-04-14 14:41:43'),('sensor','传感器类型，平台只被动从设备接收数据，不需要向设备发送指令','cui','2021-04-08 16:12:12'),('switch','开关类型，设备只支持开和关','cui','2021-04-08 16:11:30');
 /*!40000 ALTER TABLE `device_type` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -119,7 +122,7 @@ CREATE TABLE `execute_history` (
   CONSTRAINT `instruction_history_device_name_fk` FOREIGN KEY (`device_name`) REFERENCES `device` (`name`),
   CONSTRAINT `instruction_history_instruction_id_fk` FOREIGN KEY (`instruction_id`) REFERENCES `instruction` (`id`),
   CONSTRAINT `instruction_history_login_username_fk` FOREIGN KEY (`execute_by`) REFERENCES `login` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -128,6 +131,7 @@ CREATE TABLE `execute_history` (
 
 LOCK TABLES `execute_history` WRITE;
 /*!40000 ALTER TABLE `execute_history` DISABLE KEYS */;
+INSERT INTO `execute_history` VALUES (32,'asdasd',13,'','cui','2021-04-20 09:15:55');
 /*!40000 ALTER TABLE `execute_history` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -150,7 +154,7 @@ CREATE TABLE `instruction` (
   KEY `instruction_login_username_fk` (`create_by`),
   CONSTRAINT `instruction_device_type_name_fk` FOREIGN KEY (`type`) REFERENCES `device_type` (`name`),
   CONSTRAINT `instruction_login_username_fk` FOREIGN KEY (`create_by`) REFERENCES `login` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -159,7 +163,7 @@ CREATE TABLE `instruction` (
 
 LOCK TABLES `instruction` WRITE;
 /*!40000 ALTER TABLE `instruction` DISABLE KEYS */;
-INSERT INTO `instruction` VALUES (1,'on','switch',NULL,'2021-03-31 09:49:55','cui');
+INSERT INTO `instruction` VALUES (13,'qwdqqwsad','goooo','','2021-04-20 09:15:50','cui');
 /*!40000 ALTER TABLE `instruction` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -201,4 +205,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-03-31 10:09:58
+-- Dump completed on 2021-04-20 10:04:11

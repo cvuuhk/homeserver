@@ -2,6 +2,7 @@ package edu.hhuc.cvuuhk.homeserver.controller;
 
 import edu.hhuc.cvuuhk.homeserver.entity.Device;
 import edu.hhuc.cvuuhk.homeserver.entity.Instruction;
+import edu.hhuc.cvuuhk.homeserver.repository.DeviceStatusRepository;
 import edu.hhuc.cvuuhk.homeserver.request_body.ExecuteBody;
 import edu.hhuc.cvuuhk.homeserver.service.DeviceService;
 import edu.hhuc.cvuuhk.homeserver.service.InstructionService;
@@ -24,10 +25,12 @@ public class DeviceController {
   @Resource DeviceService service;
   @Resource InstructionService instructionService;
   @Resource MosquittoService mosquittoService;
+  @Resource DeviceStatusRepository deviceStatusRepository;
 
   @GetMapping("/{device_name}")
   public String getAllDevice(@PathVariable("device_name") String deviceName, Model model) {
     model.addAttribute("current_device", service.getDeviceByName(deviceName));
+    model.addAttribute("all_status", deviceStatusRepository.findAllByDeviceName(deviceName));
     return "device";
   }
 

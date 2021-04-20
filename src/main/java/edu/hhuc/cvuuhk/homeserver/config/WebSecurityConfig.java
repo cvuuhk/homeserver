@@ -28,7 +28,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .authenticated()
         .and()
         .formLogin()
-        .defaultSuccessUrl("/device/all")
         .and()
         .csrf()
         .disable();

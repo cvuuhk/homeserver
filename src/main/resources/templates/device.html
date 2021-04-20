@@ -15,7 +15,7 @@
     </script>
 </head>
 
-<!-- current_device-->
+<!-- current_device all_status-->
 <body>
 <div style="border-style: solid">
     设备名：<span th:id="device_name" th:value="${current_device.name}" th:text="${current_device.name}"></span><br>
@@ -24,6 +24,14 @@
     创建人：<span th:text="${current_device.createBy}"></span><br>
     创建时间：<span th:text="${current_device.createTime}"></span><br>
     <button onclick="deleteDevice()">删除当前设备</button>
+</div>
+
+<br>
+<div style="border-style: solid">
+    历史数据：
+    <ul th:each="status:${all_status}">
+        <li th:text="|${status.id}:${status.status},${status.datetime}|"></li>
+    </ul>
 </div>
 
 </body>
