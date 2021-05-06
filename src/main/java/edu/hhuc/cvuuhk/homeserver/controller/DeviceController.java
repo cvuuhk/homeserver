@@ -39,14 +39,15 @@ public class DeviceController {
   public String addDevice(@RequestBody @Validated Device device, Principal principal)
       throws IOException {
     final String username = principal.getName();
+    final String password = UUID.randomUUID().toString();
+    final String deviceName = device.getName();
+
+    device.setPassword(password);
     log.info("用户：" + username + "尝试添加设备：" + device.getName());
 
     service.addDevice(device);
-    final String password = UUID.randomUUID().toString();
-    final String deviceName = device.getName();
-    mosquittoService.AddUser(deviceName, password);
+//    mosquittoService.AddUser(deviceName, password);
     log.info("用户：" + username + "添加设备：" + device.getName() + "密钥：" + password);
-
     return "设备：" + deviceName + "添加成功，" + "密钥：" + password;
   }
 
@@ -59,7 +60,7 @@ public class DeviceController {
     log.info("用户：" + username + "尝试删除设备：" + deviceName);
 
     service.deleteDevice(device);
-    mosquittoService.DeleteUser(deviceName);
+//    mosquittoService.DeleteUser(deviceName);
 
     return "设备：" + deviceName + "删除成功";
   }

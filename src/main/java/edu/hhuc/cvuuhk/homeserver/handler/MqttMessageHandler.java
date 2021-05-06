@@ -24,26 +24,22 @@ public class MqttMessageHandler implements MessageHandler {
 
     String[] temp = parse(msg);
     final String deviceName = temp[0];
-    final String status = temp[1];
+    final String password = temp[1];
+    final String status = temp[2];
 
     final Device device = service.getDeviceByName(deviceName);
+    service.check(device, password);
     repository.save(new DeviceStatus(deviceName, status));
 
     log.info("设备：" + deviceName + "状态：" + status);
   }
 
   private String[] parse(String msg) throws MessagingException {
-    if (!msg.matches("\\S+:\\S+")) {
+    if (!msg.matches("\\S+,\\S+:\\S{1,128}")) {
       log.info("mqtt 消息格式有误");
       throw new MessagingException("mqtt 消息格式错误");
     }
 
-    final String[] ret = msg.split(":", 2);
-    if (ret[1].length() > 128) {
-      log.info("mqtt 消息过长");
-      throw new MessagingException("mqtt 消息体过长");
-    }
-
-    return msg.split(":", 2);
+    return msg.split("[,:]", 3);
   }
 }

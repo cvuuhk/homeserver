@@ -74,4 +74,10 @@ public class DeviceService {
     executeHistoryRepository.save(new ExecuteHistory(deviceName, instructionId, arg, username));
     log.info("用户：" + username + "操作设备：" + deviceName + "执行：" + instructionName + " " + arg);
   }
+
+  public void check(Device device, String password) throws DeviceException {
+    if (!device.getPassword().equals(password)) {
+      throw new DeviceException("设备：" + device.getName() + "，密码错误");
+    }
+  }
 }
