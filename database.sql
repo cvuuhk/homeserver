@@ -1,8 +1,8 @@
--- MariaDB dump 10.19  Distrib 10.5.9-MariaDB, for Linux (x86_64)
+-- MariaDB dump 10.19  Distrib 10.5.10-MariaDB, for Linux (x86_64)
 --
--- Host: localhost    Database: server
+-- Host: 127.0.0.1    Database: server
 -- ------------------------------------------------------
--- Server version	10.5.9-MariaDB
+-- Server version	10.5.10-MariaDB
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -43,7 +43,7 @@ CREATE TABLE `device` (
 
 LOCK TABLES `device` WRITE;
 /*!40000 ALTER TABLE `device` DISABLE KEYS */;
-INSERT INTO `device` VALUES ('google','sensor','d283aa81-12fa-4f00-9318-9f2affed9bc4','cui','2021-05-06 10:13:48','');
+INSERT INTO `device` VALUES ('smoke_sensor','sensor','c964775c-67b4-4551-b7c2-d052178f9e52','cui','2021-05-19 12:47:33','烟雾传感器');
 /*!40000 ALTER TABLE `device` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -62,7 +62,7 @@ CREATE TABLE `device_status` (
   PRIMARY KEY (`id`),
   KEY `device_status_device_name_fk` (`device_name`),
   CONSTRAINT `device_status_device_name_fk` FOREIGN KEY (`device_name`) REFERENCES `device` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -71,7 +71,7 @@ CREATE TABLE `device_status` (
 
 LOCK TABLES `device_status` WRITE;
 /*!40000 ALTER TABLE `device_status` DISABLE KEYS */;
-INSERT INTO `device_status` VALUES (14,'google','temperature:20,humidity:50','2021-05-06 10:42:40');
+INSERT INTO `device_status` VALUES (18,'smoke_sensor','温度：28℃;湿度：57%;光照强度：82lux;风扇：关;嗡鸣器：关;烟雾报警：关','2021-05-19 12:52:10');
 /*!40000 ALTER TABLE `device_status` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -124,7 +124,7 @@ CREATE TABLE `execute_history` (
   CONSTRAINT `instruction_history_device_name_fk` FOREIGN KEY (`device_name`) REFERENCES `device` (`name`),
   CONSTRAINT `instruction_history_instruction_id_fk` FOREIGN KEY (`instruction_id`) REFERENCES `instruction` (`id`),
   CONSTRAINT `instruction_history_login_username_fk` FOREIGN KEY (`execute_by`) REFERENCES `login` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -155,7 +155,7 @@ CREATE TABLE `instruction` (
   KEY `instruction_login_username_fk` (`create_by`),
   CONSTRAINT `instruction_device_type_name_fk` FOREIGN KEY (`type`) REFERENCES `device_type` (`name`),
   CONSTRAINT `instruction_login_username_fk` FOREIGN KEY (`create_by`) REFERENCES `login` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -206,4 +206,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-05-06 11:04:42
+-- Dump completed on 2021-06-03 15:46:08
